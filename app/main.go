@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"log"
+
+	// "log"
 	"os"
 
-	"github.com/joho/godotenv"
+	// "github.com/joho/godotenv"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/shared"
@@ -16,10 +17,10 @@ import (
 )
 
 func main() {
-	err := godotenv.Load() // Loads .env by default
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// err := godotenv.Load() // Loads .env by default
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 	var prompt string
 	flag.StringVar(&prompt, "p", "", "Prompt to send to LLM")
 	flag.Parse()
