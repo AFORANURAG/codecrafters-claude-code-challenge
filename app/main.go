@@ -2,10 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	"github.com/openai/openai-go/v3"
 	"github.com/openai/openai-go/v3/option"
 	"github.com/openai/openai-go/v3/shared"
@@ -13,6 +16,10 @@ import (
 )
 
 func main() {
+	err := godotenv.Load() // Loads .env by default
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	var prompt string
 	flag.StringVar(&prompt, "p", "", "Prompt to send to LLM")
 	flag.Parse()
@@ -77,8 +84,33 @@ func main() {
 	}
 
 	// You can use print statements as follows for debugging, they'll be visible when running tests.
-	fmt.Fprintln(os.Stderr, "Logs from your program will appear here!")
+	// fmt.Fprintln(os.Stderr, "Logs from your program will appear here!")
 
 	// TODO: Uncomment the line below to pass the first stage
-	fmt.Print(resp.Choices[0].Message.Content)
+	fmt.Print(resp.Choices[0].Message.ToolCalls)
+	if len(resp.Choices[0].Message.ToolCalls) > 0 {
+		// we have tool calls
+		toolCalls := resp.Choices[0].Message.ToolCalls
+		for _, toolCall := range toolCalls {
+			if toolCall.Function.Name == "Read" {
+				// we need to read using golang filesystem apis
+				var args struct {
+					FilePath string `json:"file_path"`
+				}
+				json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
+				content, err := os.ReadFile(args.FilePath)
+				if err != nil {
+					_ = fmt.Errorf("error: %v", err)
+
+				}
+				fmt.Println(string(content))
+
+			}
+		}
+	}
+
+	// When the LLM requests a Read tool call, the output matches the exact file contents
+	// When the LLM does not request a tool call, the output is the LLM's text response
+	// Your program exits with code 0
+
 }
