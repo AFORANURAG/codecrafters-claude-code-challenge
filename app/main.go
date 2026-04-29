@@ -47,7 +47,7 @@ func main() {
 			Tools: []openai.ChatCompletionToolUnionParam{
 				{
 					OfFunction: &openai.ChatCompletionFunctionToolParam{
-						Type: constant.Function.Default(),
+						Type: constant.Function("function"),
 						Function: shared.FunctionDefinitionParam{
 							Name:        "Read",
 							Description: openai.String("Read and return the contents of a file"),
