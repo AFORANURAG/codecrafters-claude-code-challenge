@@ -32,7 +32,7 @@ func main() {
 	client := openai.NewClient(option.WithAPIKey(apiKey), option.WithBaseURL(baseUrl))
 	resp, err := client.Chat.Completions.New(context.Background(),
 		openai.ChatCompletionNewParams{
-			Model: "openai/gpt-4o",
+			Model: "anthropic/claude-haiku-4.5",
 			Messages: []openai.ChatCompletionMessageParamUnion{
 				{
 					OfUser: &openai.ChatCompletionUserMessageParam{
@@ -56,5 +56,5 @@ func main() {
 	fmt.Fprintln(os.Stderr, "Logs from your program will appear here!")
 
 	// TODO: Uncomment the line below to pass the first stage
-	// fmt.Print(resp.Choices[0].Message.Content)
+	fmt.Print(resp.Choices[0].Message.Content)
 }
