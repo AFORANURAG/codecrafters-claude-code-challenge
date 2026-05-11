@@ -88,6 +88,14 @@ func main() {
 
 		// You can use print statements as follows for debugging, they'll be visible when running tests.
 		fmt.Fprintln(os.Stderr, "Logs from your program will appear here!")
+		if resp.Choices[0].Message.Content != "" {
+			messages = append(messages, openai.ChatCompletionMessageParamUnion{OfAssistant: &openai.ChatCompletionAssistantMessageParam{
+				Role: constant.Assistant("assistant"),
+				Content: openai.ChatCompletionAssistantMessageParamContentUnion{
+					OfString: openai.String(resp.Choices[0].Message.Content),
+				},
+			}})
+		}
 
 		if len(resp.Choices[0].Message.ToolCalls) == 0 {
 			fmt.Print(resp.Choices[0].Message.Content)
