@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"os/exec"
 
 	// "log"
 	"os"
@@ -21,6 +22,7 @@ func main() {
 	// if err != nil {
 	// 	log.Fatal("Error loading .env file")
 	// }
+
 	var prompt string
 	flag.StringVar(&prompt, "p", "", "Prompt to send to LLM")
 	flag.Parse()
@@ -99,6 +101,26 @@ func main() {
 							},
 						},
 					},
+					{
+						OfFunction: &openai.ChatCompletionFunctionToolParam{
+							Type: constant.Function("function"),
+							Function: shared.FunctionDefinitionParam{
+								Name:        "Bash",
+								Description: openai.String("Execute a shell command"),
+								Strict:      openai.Bool(true),
+								Parameters: map[string]interface{}{
+									"type": "object",
+									"properties": map[string]interface{}{
+										"command": map[string]interface{}{
+											"type":        "string",
+											"description": "The command to execute",
+										},
+									},
+									"required": []string{"command"},
+								},
+							},
+						},
+					},
 				},
 			},
 		)
@@ -166,6 +188,29 @@ func main() {
 				messages = append(messages, openai.ChatCompletionMessageParamUnion{OfTool: &openai.ChatCompletionToolMessageParam{
 					Content: openai.ChatCompletionToolMessageParamContentUnion{
 						OfString: openai.String("Successfully wrote to file"),
+					},
+					ToolCallID: toolCall.ID,
+					Role:       constant.Tool("tool"),
+				}})
+			}
+			if toolCall.Function.Name == "Bash" {
+				// we need to read using golang filesystem apis
+				var args struct {
+					Command string `json:"command"`
+				}
+				json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
+				cmd := exec.Command(args.Command)
+
+				out, err := cmd.Output()
+
+				if err != nil {
+					_ = fmt.Errorf("Errored command is :%v", args.Command)
+					_ = fmt.Errorf("error while executing the bash command: %v", err)
+				}
+
+				messages = append(messages, openai.ChatCompletionMessageParamUnion{OfTool: &openai.ChatCompletionToolMessageParam{
+					Content: openai.ChatCompletionToolMessageParamContentUnion{
+						OfString: openai.String(string(out)),
 					},
 					ToolCallID: toolCall.ID,
 					Role:       constant.Tool("tool"),
