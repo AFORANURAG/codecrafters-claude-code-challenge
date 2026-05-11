@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"strconv"
 
 	// "log"
 	"os"
@@ -154,28 +153,23 @@ func main() {
 				// we need to read using golang filesystem apis
 				var args struct {
 					FilePath string `json:"file_path"`
+					Content  string `json:"content"`
 				}
 				json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
-				f, err := os.OpenFile(args.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 
-				if err != nil {
-					_ = fmt.Errorf("error while opening file : %v", err)
-
-				}
-				defer f.Close()
-				r, err := f.WriteString("new data to append\n")
+				err := os.WriteFile(args.FilePath, []byte(args.Content), 0644)
 
 				if err != nil {
 					_ = fmt.Errorf("error while writing to file: %v", err)
 				}
 
-				messages = append(messages, openai.ChatCompletionMessageParamUnion{OfTool: &openai.ChatCompletionToolMessageParam{
-					Content: openai.ChatCompletionToolMessageParamContentUnion{
-						OfString: openai.String(strconv.Itoa(r)),
-					},
-					ToolCallID: toolCall.ID,
-					Role:       constant.Tool("tool"),
-				}})
+				// messages = append(messages, openai.ChatCompletionMessageParamUnion{OfTool: &openai.ChatCompletionToolMessageParam{
+				// 	Content: openai.ChatCompletionToolMessageParamContentUnion{
+				// 		OfString: nilness,
+				// 	},
+				// 	ToolCallID: toolCall.ID,
+				// 	Role:       constant.Tool("tool"),
+				// }})
 			}
 		}
 
