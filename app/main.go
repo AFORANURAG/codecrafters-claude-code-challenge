@@ -199,7 +199,7 @@ func main() {
 					Command string `json:"command"`
 				}
 				json.Unmarshal([]byte(toolCall.Function.Arguments), &args)
-				cmd := exec.Command(args.Command)
+				cmd := exec.Command("sh", "-c", args.Command)
 
 				out, err := cmd.Output()
 
