@@ -163,13 +163,13 @@ func main() {
 					_ = fmt.Errorf("error while writing to file: %v", err)
 				}
 
-				// messages = append(messages, openai.ChatCompletionMessageParamUnion{OfTool: &openai.ChatCompletionToolMessageParam{
-				// 	Content: openai.ChatCompletionToolMessageParamContentUnion{
-				// 		OfString: nilness,
-				// 	},
-				// 	ToolCallID: toolCall.ID,
-				// 	Role:       constant.Tool("tool"),
-				// }})
+				messages = append(messages, openai.ChatCompletionMessageParamUnion{OfTool: &openai.ChatCompletionToolMessageParam{
+					Content: openai.ChatCompletionToolMessageParamContentUnion{
+						OfString: openai.String("Successfully wrote to file"),
+					},
+					ToolCallID: toolCall.ID,
+					Role:       constant.Tool("tool"),
+				}})
 			}
 		}
 
