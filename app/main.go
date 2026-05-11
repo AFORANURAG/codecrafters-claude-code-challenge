@@ -88,14 +88,14 @@ func main() {
 									"properties": map[string]interface{}{
 										"file_path": map[string]interface{}{
 											"type":        "string",
-											"description": "The path to the file to read",
+											"description": "The path of the file to write to",
 										},
 										"content": map[string]interface{}{
 											"type":        "string",
 											"description": "The content to write to the file",
 										},
 									},
-									"required": []string{"file_path"},
+									"required": []string{"file_path", "content"},
 								},
 							},
 						},
